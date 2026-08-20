@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#140e24">
+  <title>Büyülü Kazan</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #140e24; }
+    body { display: grid; place-items: center; font-family: system-ui, sans-serif; color: white; }
+    #unity-container { position: relative; width: min(100vw, 600px); height: 100%; background: #140e24; }
+    #unity-canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+    #loading { position: absolute; inset: 0; display: grid; place-content: center; gap: 16px; text-align: center; background: #140e24; }
+    #bar { width: min(70vw, 340px); height: 12px; overflow: hidden; border-radius: 999px; background: #302348; }
+    #fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #a94ff0, #ff7a2f); }
+    #message { position: absolute; left: 12px; right: 12px; bottom: 12px; display: none; padding: 10px; border-radius: 8px; background: #9f2434; }
+  </style>
+</head>
+<body>
+  <main id="unity-container">
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <section id="loading">
+      <strong>Büyülü Kazan hazırlanıyor…</strong>
+      <div id="bar"><div id="fill"></div></div>
+    </section>
+    <div id="message"></div>
+  </main>
+  <script>
+    const canvas = document.querySelector('#unity-canvas');
+    const loading = document.querySelector('#loading');
+    const fill = document.querySelector('#fill');
+    const message = document.querySelector('#message');
+    const buildUrl = 'Build';
+    const loaderUrl = buildUrl + '/{{{ LOADER_FILENAME }}}';
+    const config = {
+      dataUrl: buildUrl + '/{{{ DATA_FILENAME }}}',
+      frameworkUrl: buildUrl + '/{{{ FRAMEWORK_FILENAME }}}',
+      codeUrl: buildUrl + '/{{{ CODE_FILENAME }}}',
+      streamingAssetsUrl: 'StreamingAssets',
+      companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+      productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+      productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}}
+    };
+    window.addEventListener('resize', () => window.dispatchEvent(new Event('orientationchange')));
+    const script = document.createElement('script');
+    script.src = loaderUrl;
+    script.onload = () => createUnityInstance(canvas, config, progress => {
+      fill.style.width = `${Math.round(progress * 100)}%`;
+    }).then(() => loading.remove()).catch(error => {
+      message.style.display = 'block';
+      message.textContent = error;
+    });
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#140e24">
+  <title>Büyülü Kazan — Match 3</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game-shell">
+    <header>
+      <p class="eyebrow">İKSİR ATÖLYESİ</p>
+      <h1> Büyülü Kazan </h1>
+      <p class="subhead">Aynı malzemeleri üçlü eşleştir, iksirini tamamla.</p>
+    </header>
+    <section class="status" aria-live="polite">
+      <div><span>Hamle</span><strong id="moves">25</strong></div>
+      <div><span>Hedef</span><strong><i id="target-dot"></i><b id="score">0</b>/20</strong></div>
+    </section>
+    <div class="board-wrap"><canvas id="board" aria-label="Eşleştirme tahtası"></canvas></div>
+    <p class="hint" id="hint">Bir malzemeyi komşusuna sürükle.</p>
+    <button id="restart" class="restart" type="button">Yeniden başlat</button>
+  </main>
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card"><p class="eyebrow">İKSİR ATÖLYESİ</p><h2 id="modal-title"></h2><p id="modal-copy"></p><button id="modal-restart" class="restart" type="button">Tekrar oyna</button></div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
