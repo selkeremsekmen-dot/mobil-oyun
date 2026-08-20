@@ -12,6 +12,8 @@ Unity ile geliştirilen, iksir malzemelerini eşleştirme temalı mobil Match-3 
 - Hamle sınırı ve renk bazlı bölüm hedefi
 - Kazanma, kaybetme ve yeniden başlatma ekranı
 - Başlangıçta hazır eşleşme ve olası hamlesiz tahta oluşmasını engelleme
+- Geçerli hamlede yumuşak parça kayması, geçersiz hamlede geri sekme
+- Eşleşmelerde renkli parçacık patlaması, parlama halkası ve hafif ekran sarsıntısı
 
 ## Çalıştırma
 
@@ -20,6 +22,8 @@ Unity ile geliştirilen, iksir malzemelerini eşleştirme temalı mobil Match-3 
 3. Bir parçayı yatay veya dikey komşusuna sürükleyin.
 
 Prototip harici görsel dosyaya ihtiyaç duymaz; renkli parçalar çalışma anında üretilir. Böylece depo klonlandıktan sonra doğrudan denenebilir.
+
+Web prototipinde aynı hareket ve patlama efektleri `docs/game.js` içinde harici kütüphane olmadan çizilir. GitHub Pages sürümü doğrudan tarayıcıda oynanabilir.
 
 ## Sonraki adımlar
 

@@ -111,12 +111,13 @@ namespace BuyuluKazan
             resolving = true;
             board.Swap(from.x, from.y, to.x, to.y);
             RefreshViews();
-            yield return new WaitForSeconds(0.12f);
+            yield return AnimateSwap(from, to, 0.18f);
             HashSet<int> matches = board.FindMatches();
             if (matches.Count == 0)
             {
                 board.Swap(from.x, from.y, to.x, to.y);
                 RefreshViews();
+                yield return AnimateSwap(from, to, 0.14f);
                 resolving = false;
                 yield break;
             }
@@ -124,10 +125,15 @@ namespace BuyuluKazan
             moves--;
             while (matches.Count > 0)
             {
+                foreach (int index in matches)
+                {
+                    board.FromIndex(index, out int x, out int y);
+                    SpawnExplosion(CellPosition(x, y), board[x, y]);
+                }
                 Dictionary<int, int> cleared = board.ClearMatches(matches);
                 if (cleared.TryGetValue(targetColor, out int amount)) collected += amount;
                 RefreshViews();
-                yield return new WaitForSeconds(0.16f);
+                yield return new WaitForSeconds(0.24f);
                 board.CollapseAndRefill();
                 RefreshViews();
                 yield return new WaitForSeconds(0.16f);
@@ -138,6 +144,48 @@ namespace BuyuluKazan
             else if (moves <= 0) gameOver = true;
             else if (!board.HasPossibleMove()) { board.Shuffle(); RefreshViews(); }
             resolving = false;
+        }
+
+        private IEnumerator AnimateSwap(Vector2Int from, Vector2Int to, float duration)
+        {
+            Vector3 fromPosition = CellPosition(from.x, from.y);
+            Vector3 toPosition = CellPosition(to.x, to.y);
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float linear = Mathf.Clamp01(elapsed / duration);
+                float eased = linear * linear * (3f - 2f * linear);
+                views[from.x, from.y].transform.position = Vector3.Lerp(fromPosition, toPosition, eased);
+                views[to.x, to.y].transform.position = Vector3.Lerp(toPosition, fromPosition, eased);
+                yield return null;
+            }
+            views[from.x, from.y].transform.position = fromPosition;
+            views[to.x, to.y].transform.position = toPosition;
+        }
+
+        private void SpawnExplosion(Vector3 position, int colorIndex)
+        {
+            var effectObject = new GameObject("Malzeme Patlaması");
+            effectObject.transform.position = position;
+            var particleSystem = effectObject.AddComponent<ParticleSystem>();
+            var main = particleSystem.main;
+            main.duration = 0.45f;
+            main.loop = false;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(0.24f, 0.48f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(1.4f, 3.2f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.06f, 0.14f);
+            main.startColor = colors[colorIndex];
+            main.maxParticles = 24;
+            var emission = particleSystem.emission;
+            emission.rateOverTime = 0f;
+            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 16) });
+            var shape = particleSystem.shape;
+            shape.shapeType = ParticleSystemShapeType.Circle;
+            shape.radius = 0.08f;
+            var particleRenderer = effectObject.GetComponent<ParticleSystemRenderer>();
+            particleRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            Destroy(effectObject, 1.2f);
         }
 
         private void RefreshViews()
