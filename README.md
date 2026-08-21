@@ -16,6 +16,9 @@ Unity ile geliştirilen, iksir malzemelerini eşleştirme temalı mobil Match-3 
 - Geçerli hamlede yumuşak parça kayması, geçersiz hamlede geri sekme
 - Eşleşmelerde renkli parçacık patlaması, parlama halkası ve hafif ekran sarsıntısı
 - Orman temalı koyu arka plan, yüksek DPI parlak top çizimleri ve güç çubuğu
+- Web sürümünde Kar Vadisi, Büyülü Orman ve Lav Mağaraları olmak üzere 3 bölüm ve 18 sıralı seviye
+- Tamamlanan seviyenin 1–3 yıldızı harita üzerinde seviyenin üstünde saklanır; ilerleme tarayıcıda korunur
+- Önceki seviye tamamlanmadan sonraki seviye ve yeni bölüm kilitli kalır
 
 ## Çalıştırma
 
