@@ -1,7 +1,9 @@
 {
   "name": "BuyuluKazan",
   "rootNamespace": "BuyuluKazan",
-  "references": [],
+  "references": [
+    "UnityEngine.ParticleSystemModule"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
