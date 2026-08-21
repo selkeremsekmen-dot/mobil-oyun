@@ -9,17 +9,33 @@
 </head>
 <body>
   <main class="game-shell">
-    <header>
-      <p class="eyebrow">İKSİR ATÖLYESİ</p>
-      <h1> Büyülü Kazan </h1>
-      <p class="subhead">Aynı malzemeleri üçlü eşleştir, iksirini tamamla.</p>
+    <header class="topbar">
+      <button class="icon-button" type="button" aria-label="Menü">☰</button>
+      <div>
+        <p class="eyebrow">BÜYÜLÜ ORMAN • BÖLÜM 1</p>
+        <h1>Büyülü Kazan</h1>
+      </div>
+      <button class="icon-button" type="button" aria-label="Ayarlar">⚙</button>
     </header>
-    <section class="status" aria-live="polite">
-      <div><span>Hamle</span><strong id="moves">25</strong></div>
-      <div><span>Hedef</span><strong><i id="target-dot"></i><b id="score">0</b>/20</strong></div>
+
+    <section class="cauldron-card" id="cauldron" aria-label="Büyü gücü">
+      <div class="cauldron-title"><span>🧪</span><strong>GÖRÜNMEZLİK İKSİRİ</strong><span>✨</span></div>
+      <div class="cauldron-art" aria-hidden="true">
+        <div class="cauldron-glow"></div><div class="cauldron-pot"><i></i><b></b><em></em></div>
+        <span class="bubble bubble-a">•</span><span class="bubble bubble-b">•</span><span class="bubble bubble-c">•</span>
+      </div>
+      <div class="power-label"><span>BÜYÜ GÜCÜ</span><strong id="power-value">0%</strong></div>
+      <div class="power-track"><div id="power-fill" class="power-fill"></div></div>
+    </section>
+
+    <section class="recipe-card" aria-live="polite">
+      <div class="recipe-heading"><span>Tarif malzemeleri</span><strong id="moves">25 hamle</strong></div>
+      <div id="goals" class="goals"></div>
+      <p class="subhead">Aynı renkten üç veya daha fazlasını eşleştir.</p>
     </section>
     <div class="board-wrap"><canvas id="board" aria-label="Eşleştirme tahtası"></canvas></div>
     <p class="hint" id="hint">Bir malzemeyi komşusuna sürükle.</p>
+    <div class="toolbelt" aria-label="Güçler"><button type="button" disabled>🔨 <b>2</b></button><button type="button" disabled>💣 <b>1</b></button><button type="button" disabled>🌈 <b>1</b></button></div>
     <button id="restart" class="restart" type="button">Yeniden başlat</button>
   </main>
   <div id="modal" class="modal" hidden>

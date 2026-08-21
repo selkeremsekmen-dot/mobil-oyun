@@ -15,6 +15,8 @@ namespace BuyuluKazan
             new Color(0.25f, 0.85f, 0.38f), new Color(1f, 0.78f, 0.18f),
             new Color(0.67f, 0.31f, 0.92f), new Color(1f, 0.45f, 0.13f)
         };
+        private readonly int[] goalColors = { 1, 4, 2 };
+        private readonly int[] goalTargets = { 15, 10, 5 };
 
         private BoardModel board;
         private SpriteRenderer[,] views;
@@ -25,8 +27,9 @@ namespace BuyuluKazan
         private bool resolving;
         private bool gameOver;
         private int moves;
-        private int collected;
-        private int targetColor;
+        private int[] collectedGoals;
+        private float magicPower;
+        private static Texture2D panelTexture;
 
         private void Awake()
         {
@@ -43,8 +46,8 @@ namespace BuyuluKazan
             if (!board.HasPossibleMove()) board.Shuffle();
             views = new SpriteRenderer[Size, Size];
             moves = 25;
-            collected = 0;
-            targetColor = Random.Range(0, ColorCount);
+            collectedGoals = new int[goalColors.Length];
+            magicPower = 0f;
             selected = null;
             resolving = false;
             gameOver = false;
@@ -131,7 +134,10 @@ namespace BuyuluKazan
                     SpawnExplosion(CellPosition(x, y), board[x, y]);
                 }
                 Dictionary<int, int> cleared = board.ClearMatches(matches);
-                if (cleared.TryGetValue(targetColor, out int amount)) collected += amount;
+                for (int goalIndex = 0; goalIndex < goalColors.Length; goalIndex++)
+                    if (cleared.TryGetValue(goalColors[goalIndex], out int amount))
+                        collectedGoals[goalIndex] = Mathf.Min(goalTargets[goalIndex], collectedGoals[goalIndex] + amount);
+                magicPower = Mathf.Clamp(magicPower + matches.Count * 3.5f, 0f, 100f);
                 RefreshViews();
                 yield return new WaitForSeconds(0.24f);
                 board.CollapseAndRefill();
@@ -140,7 +146,7 @@ namespace BuyuluKazan
                 matches = board.FindMatches();
             }
 
-            if (collected >= 20) gameOver = true;
+            if (AllGoalsComplete()) gameOver = true;
             else if (moves <= 0) gameOver = true;
             else if (!board.HasPossibleMove()) { board.Shuffle(); RefreshViews(); }
             resolving = false;
@@ -166,26 +172,53 @@ namespace BuyuluKazan
 
         private void SpawnExplosion(Vector3 position, int colorIndex)
         {
-            var effectObject = new GameObject("Malzeme Patlaması");
-            effectObject.transform.position = position;
-            var particleSystem = effectObject.AddComponent<ParticleSystem>();
-            var main = particleSystem.main;
-            main.duration = 0.45f;
-            main.loop = false;
-            main.startLifetime = new ParticleSystem.MinMaxCurve(0.24f, 0.48f);
-            main.startSpeed = new ParticleSystem.MinMaxCurve(1.4f, 3.2f);
-            main.startSize = new ParticleSystem.MinMaxCurve(0.06f, 0.14f);
-            main.startColor = colors[colorIndex];
-            main.maxParticles = 24;
-            var emission = particleSystem.emission;
-            emission.rateOverTime = 0f;
-            emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 16) });
-            var shape = particleSystem.shape;
-            shape.shapeType = ParticleSystemShapeType.Circle;
-            shape.radius = 0.08f;
-            var particleRenderer = effectObject.GetComponent<ParticleSystemRenderer>();
-            particleRenderer.material = new Material(Shader.Find("Sprites/Default"));
-            Destroy(effectObject, 1.2f);
+            // ParticleSystem paketi kurulu olmasa bile çalışması için patlamayı küçük SpriteRenderer parçalarıyla oluştur.
+            StartCoroutine(AnimateExplosion(position, colorIndex));
+        }
+
+        private IEnumerator AnimateExplosion(Vector3 position, int colorIndex)
+        {
+            const int sparkCount = 12;
+            const float duration = 0.48f;
+            var sparks = new GameObject[sparkCount];
+            var renderers = new SpriteRenderer[sparkCount];
+            var velocities = new Vector3[sparkCount];
+            Color sparkColor = colors[colorIndex];
+
+            for (int i = 0; i < sparkCount; i++)
+            {
+                float angle = (Mathf.PI * 2f * i / sparkCount) + Random.Range(-0.18f, 0.18f);
+                float speed = Random.Range(0.65f, 1.55f);
+                var spark = new GameObject("Patlama Parçacığı");
+                spark.transform.SetParent(transform);
+                spark.transform.position = position;
+                spark.transform.localScale = Vector3.one * 0.15f;
+                var renderer = spark.AddComponent<SpriteRenderer>();
+                renderer.sprite = pieceSprite;
+                renderer.color = sparkColor;
+                renderer.sortingOrder = 3;
+                sparks[i] = spark;
+                renderers[i] = renderer;
+                velocities[i] = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * speed;
+            }
+
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float progress = Mathf.Clamp01(elapsed / duration);
+                for (int i = 0; i < sparkCount; i++)
+                {
+                    sparks[i].transform.position += velocities[i] * Time.deltaTime;
+                    sparks[i].transform.localScale = Vector3.one * Mathf.Lerp(0.15f, 0.025f, progress);
+                    Color fade = sparkColor;
+                    fade.a = 1f - progress;
+                    renderers[i].color = fade;
+                }
+                yield return null;
+            }
+
+            for (int i = 0; i < sparkCount; i++) Destroy(sparks[i]);
         }
 
         private void RefreshViews()
@@ -202,23 +235,60 @@ namespace BuyuluKazan
             }
         }
 
+        private bool AllGoalsComplete()
+        {
+            for (int i = 0; i < goalTargets.Length; i++)
+                if (collectedGoals[i] < goalTargets[i]) return false;
+            return true;
+        }
+
         private void OnGUI()
         {
             var title = new GUIStyle(GUI.skin.label) { fontSize = 28, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
             title.normal.textColor = Color.white;
-            GUI.Label(new Rect(0, 12, Screen.width, 45), "BÜYÜLÜ KAZAN", title);
+            var panel = new GUIStyle(GUI.skin.box);
+            panel.normal.background = MakeGuiTexture(new Color(0.08f, 0.18f, 0.21f, 0.94f));
+            GUI.Box(new Rect(22, 8, Screen.width - 44, 168), GUIContent.none, panel);
+            GUI.Label(new Rect(0, 15, Screen.width, 38), "🧪  BÜYÜLÜ KAZAN  ✨", title);
 
-            var info = new GUIStyle(title) { fontSize = 20 };
-            GUI.Label(new Rect(0, 55, Screen.width, 34), $"Hamle: {moves}     Hedef: {collected}/20", info);
-            Color old = GUI.color;
-            GUI.color = colors[targetColor];
-            GUI.DrawTexture(new Rect(Screen.width / 2f + 125, 61, 22, 22), Texture2D.whiteTexture);
-            GUI.color = old;
+            var recipe = new GUIStyle(title) { fontSize = 14 };
+            GUI.Label(new Rect(0, 52, Screen.width, 24), "GÖRÜNMEZLİK İKSİRİ", recipe);
+            GUI.Label(new Rect(34, 78, 140, 22), "BÜYÜ GÜCÜ", recipe);
+            GUI.Label(new Rect(Screen.width - 115, 78, 80, 22), $"{Mathf.RoundToInt(magicPower)}%", recipe);
+            GUI.color = new Color(0.05f, 0.12f, 0.14f);
+            GUI.DrawTexture(new Rect(34, 103, Screen.width - 68, 11), Texture2D.whiteTexture);
+            GUI.color = new Color(0.35f, 0.9f, 0.78f);
+            GUI.DrawTexture(new Rect(34, 103, (Screen.width - 68) * magicPower / 100f, 11), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+
+            var goalStyle = new GUIStyle(GUI.skin.label) { fontSize = 14, alignment = TextAnchor.MiddleLeft, fontStyle = FontStyle.Bold };
+            for (int i = 0; i < goalColors.Length; i++)
+            {
+                float x = 34 + i * ((Screen.width - 68) / 3f);
+                GUI.color = colors[goalColors[i]];
+                GUI.DrawTexture(new Rect(x, 128, 18, 18), Texture2D.whiteTexture);
+                GUI.color = Color.white;
+                GUI.Label(new Rect(x + 23, 126, 100, 22), $"{collectedGoals[i]}/{goalTargets[i]}", goalStyle);
+            }
+
+            var info = new GUIStyle(title) { fontSize = 18 };
+            GUI.Label(new Rect(0, 184, Screen.width, 30), $"Kalan Hamle: {moves}", info);
 
             if (!gameOver) return;
             GUI.Box(new Rect(Screen.width / 2f - 170, Screen.height / 2f - 80, 340, 160), "");
-            GUI.Label(new Rect(Screen.width / 2f - 160, Screen.height / 2f - 60, 320, 55), collected >= 20 ? "İKSİR HAZIR!" : "HAMLELER BİTTİ", title);
+            GUI.Label(new Rect(Screen.width / 2f - 160, Screen.height / 2f - 60, 320, 55), AllGoalsComplete() ? "İKSİR HAZIR!" : "HAMLELER BİTTİ", title);
             if (GUI.Button(new Rect(Screen.width / 2f - 90, Screen.height / 2f + 15, 180, 45), "Yeniden Oyna")) StartLevel();
+        }
+
+        private static Texture2D MakeGuiTexture(Color color)
+        {
+            if (panelTexture == null)
+            {
+                panelTexture = new Texture2D(1, 1);
+                panelTexture.SetPixel(0, 0, color);
+                panelTexture.Apply();
+            }
+            return panelTexture;
         }
 
         private Vector3 CellPosition(int x, int y) => new Vector3((x - 3.5f) * CellSize, (y - 3.9f) * CellSize, 0);

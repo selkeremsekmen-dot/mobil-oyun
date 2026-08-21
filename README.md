@@ -9,11 +9,13 @@ Unity ile geliştirilen, iksir malzemelerini eşleştirme temalı mobil Match-3 
 - Yatay/dikey 3+ eşleşmeleri bulma
 - Geçersiz hamleyi geri alma
 - Parçaları temizleme, yer çekimi, yeniden doldurma ve zincirleme eşleşmeler
-- Hamle sınırı ve renk bazlı bölüm hedefi
+- Hamle sınırı ve çoklu tarif hedefi (Mavi 15, Mor 10, Yeşil 5)
+- Üstte animasyonlu kazan, büyü gücü barı ve tarif malzemeleri göstergesi
 - Kazanma, kaybetme ve yeniden başlatma ekranı
 - Başlangıçta hazır eşleşme ve olası hamlesiz tahta oluşmasını engelleme
 - Geçerli hamlede yumuşak parça kayması, geçersiz hamlede geri sekme
 - Eşleşmelerde renkli parçacık patlaması, parlama halkası ve hafif ekran sarsıntısı
+- Orman temalı koyu arka plan, yüksek DPI parlak top çizimleri ve güç çubuğu
 
 ## Çalıştırma
 
