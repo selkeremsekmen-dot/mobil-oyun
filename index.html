@@ -10,37 +10,56 @@
 <body>
   <main class="game-shell">
     <header class="topbar">
-      <button class="icon-button" type="button" aria-label="Menü">☰</button>
+      <button id="map-home" class="icon-button" type="button" aria-label="Seviye haritasına dön" hidden>←</button>
       <div>
-        <p class="eyebrow">BÜYÜLÜ ORMAN • BÖLÜM 1</p>
-        <h1>Büyülü Kazan</h1>
+        <p id="screen-eyebrow" class="eyebrow">BÜYÜLÜ KAZAN • SEVİYE HARİTASI</p>
+        <h1 id="screen-title">Büyülü Kazan</h1>
       </div>
       <button class="icon-button" type="button" aria-label="Ayarlar">⚙</button>
     </header>
 
-    <section class="cauldron-card" id="cauldron" aria-label="Büyü gücü">
-      <div class="cauldron-title"><span>🧪</span><strong>GÖRÜNMEZLİK İKSİRİ</strong><span>✨</span></div>
-      <div class="cauldron-art" aria-hidden="true">
-        <div class="cauldron-glow"></div><div class="cauldron-pot"><i></i><b></b><em></em></div>
-        <span class="bubble bubble-a">•</span><span class="bubble bubble-b">•</span><span class="bubble bubble-c">•</span>
+    <section id="level-map" class="level-map" aria-label="Bölüm ve seviye haritası">
+      <div class="map-hero">
+        <div>
+          <p class="eyebrow">MACERA HARİTASI</p>
+          <h2>Krallığı kurtar</h2>
+          <p>Her seviyeyi tamamla, yıldızlarını topla ve bir sonraki büyülü bölgenin kilidini aç.</p>
+        </div>
+        <div class="map-progress" aria-live="polite">
+          <span>İLERLEME</span>
+          <strong id="map-progress">0 / 18</strong>
+          <small>seviye tamamlandı</small>
+        </div>
       </div>
-      <div class="power-label"><span>BÜYÜ GÜCÜ</span><strong id="power-value">0%</strong></div>
-      <div class="power-track"><div id="power-fill" class="power-fill"></div></div>
+      <div id="world-list" class="world-list"></div>
+      <p class="map-tip">🔒 Bir sonraki seviye, önceki seviyeyi tamamladığında açılır.</p>
     </section>
 
-    <section class="recipe-card" aria-live="polite">
-      <div class="recipe-heading"><span>Tarif malzemeleri</span><strong id="moves">25 hamle</strong></div>
-      <div id="goals" class="goals"></div>
-      <p class="subhead">Aynı renkten üç veya daha fazlasını eşleştir.</p>
+    <section id="game-screen" hidden>
+      <section class="cauldron-card" id="cauldron" aria-label="Büyü gücü">
+        <div class="cauldron-title"><span>🧪</span><strong>GÖRÜNMEZLİK İKSİRİ</strong><span>✨</span></div>
+        <div class="cauldron-art" aria-hidden="true">
+          <div class="cauldron-glow"></div><div class="cauldron-pot"><i></i><b></b><em></em></div>
+          <span class="bubble bubble-a">•</span><span class="bubble bubble-b">•</span><span class="bubble bubble-c">•</span>
+        </div>
+        <div class="power-label"><span>BÜYÜ GÜCÜ</span><strong id="power-value">0%</strong></div>
+        <div class="power-track"><div id="power-fill" class="power-fill"></div></div>
+      </section>
+
+      <section class="recipe-card" aria-live="polite">
+        <div class="recipe-heading"><span>Tarif malzemeleri</span><strong id="moves">25 hamle</strong></div>
+        <div id="goals" class="goals"></div>
+        <p class="subhead">Aynı renkten üç veya daha fazlasını eşleştir.</p>
+      </section>
+      <div class="board-wrap"><canvas id="board" aria-label="Eşleştirme tahtası"></canvas></div>
+      <p class="hint" id="hint">Bir malzemeyi komşusuna sürükle.</p>
+      <div class="toolbelt" aria-label="Güçler"><button type="button" disabled>🔨 <b>2</b></button><button type="button" disabled>💣 <b>1</b></button><button type="button" disabled>🌈 <b>1</b></button></div>
+      <button id="restart" class="restart" type="button">Yeniden başlat</button>
     </section>
-    <div class="board-wrap"><canvas id="board" aria-label="Eşleştirme tahtası"></canvas></div>
-    <p class="hint" id="hint">Bir malzemeyi komşusuna sürükle.</p>
-    <div class="toolbelt" aria-label="Güçler"><button type="button" disabled>🔨 <b>2</b></button><button type="button" disabled>💣 <b>1</b></button><button type="button" disabled>🌈 <b>1</b></button></div>
-    <button id="restart" class="restart" type="button">Yeniden başlat</button>
   </main>
   <div id="modal" class="modal" hidden>
-    <div class="modal-card"><p class="eyebrow">İKSİR ATÖLYESİ</p><h2 id="modal-title"></h2><p id="modal-copy"></p><button id="modal-restart" class="restart" type="button">Tekrar oyna</button></div>
+    <div class="modal-card"><p class="eyebrow">İKSİR ATÖLYESİ</p><h2 id="modal-title"></h2><p id="modal-copy"></p><div class="modal-actions"><button id="modal-map" class="secondary-button" type="button">Haritaya dön</button><button id="modal-restart" class="restart" type="button">Tekrar oyna</button></div></div>
   </div>
-  <script src="game.js?v=ed721eb"></script>
+  <script src="game.js?v=levels-1"></script>
 </body>
 </html>
